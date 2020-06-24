@@ -1,6 +1,6 @@
 #include "crypto.hpp"
 #include <QCryptographicHash>
-#include <QtCrypto>
+#include <Qca-qt5/QtCrypto/QtCrypto>
 
 #include <QDebug>
 

@@ -2,7 +2,6 @@
 #define QTZ_SIMPLEAUTHENTICATOR_HPP
 
 #include "authenticator.hpp"
-#include <QtSql/QSqlDatabase>
 
 class SimpleAuthenticator : public Authenticator {
 public:
