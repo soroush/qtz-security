@@ -2,8 +2,9 @@
 #define QTZ_SECURITY_KEYRING_HPP
 
 #include <QByteArray>
+#include "qtz-security.hpp"
 
-class KeyRing {
+class QTZ_SECURITY_SHARED_EXPORT KeyRing {
 public:
     KeyRing() = default;
     virtual ~KeyRing() = default;

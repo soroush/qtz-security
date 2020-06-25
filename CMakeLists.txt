@@ -15,8 +15,11 @@ endif()
 
 # Check for dependencies
 find_package(Qt5 COMPONENTS Core REQUIRED)
+if(WIN32)
+find_package(qca CONFIG REQUIRED)
+else()
 find_package(Qca-qt5 CONFIG REQUIRED)
-
+endif()
 # Include directories
 include_directories("include")
 
@@ -99,4 +102,11 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/QtzSecurity.pc
         DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/pkgconfig)
 
 # Link againsg dependencies
-target_link_libraries(QtzSecurity Qt5::Core qca-qt5)
+target_link_libraries(QtzSecurity PUBLIC Qt5::Core)
+
+# Handle different names under different OSes
+if(WIN32)
+target_link_libraries(QtzSecurity PRIVATE qca)
+else()
+target_link_libraries(QtzSecurity PRIVATE qca-qt5)
+endif()
