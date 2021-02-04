@@ -20,17 +20,15 @@ find_package(qca CONFIG REQUIRED)
 else()
 find_package(Qca-qt5 CONFIG REQUIRED)
 endif()
-# Include directories
-include_directories("include")
 
 # OS-dependent sources
 set(OS_SOURCES )
 if(WIN32)
-    list(APPEND OS_SOURCES QtzSecurity.rc)
+    list(APPEND OS_SOURCES ${PROJECT_NAME}.rc)
 endif()
 
 # Define the library
-add_library (QtzSecurity SHARED
+add_library (${PROJECT_NAME} SHARED
     src/virtual-machine-detector.cpp
     src/username.cpp
     src/unique-machine-id.cpp
@@ -59,54 +57,73 @@ add_library (QtzSecurity SHARED
     include/authorizer.hpp
     include/authenticator.hpp
     include/authentication-source.hpp
-    ${OS_SOURCES})
-
-# Add 'd' suffix to debug builds
-set_property(TARGET QtzSecurity PROPERTY DEBUG_POSTFIX d)
-
-# Set version
-set_target_properties(QtzSecurity PROPERTIES VERSION 0.4.0)
-set_target_properties(QtzSecurity PROPERTIES SOVERSION 0)
-
-# pkg-config
-configure_file(QtzSecurity.pc.in QtzSecurity.pc @ONLY)
-
-# Define symbol exporter
-target_compile_definitions(QtzSecurity PRIVATE -DQTZ_SECURITY_LIBRARY)
-target_compile_features(QtzSecurity PRIVATE cxx_std_11)
-
-# Install and export
-include(GNUInstallDirs)
-target_include_directories(QtzSecurity PUBLIC  
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/>  
-    $<INSTALL_INTERFACE:include/>
+    ${OS_SOURCES}
 )
 
-install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/qtz/security)
+# Set properties
+set_target_properties(${PROJECT_NAME} PROPERTIES 
+    PROPERTIES VERSION 0.4.0
+    PROPERTIES SOVERSION 0
+    CXX_STANDARD 11
+    DEBUG_POSTFIX "d"
+    DEFINE_SYMBOL "QTZ_SECURITY_LIBRARY"
+)
 
-install(TARGETS QtzSecurity
-    EXPORT QtzSecurityConfig
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
-
-export(TARGETS QtzSecurity FILE QtzSecurityConfig.cmake)
-
-install(EXPORT QtzSecurityConfig
-    FILE QtzSecurityConfig.cmake
-    NAMESPACE Qtz::
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/)
-
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/QtzSecurity.pc 
-        DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/pkgconfig)
+target_include_directories(${PROJECT_NAME}
+    PUBLIC 
+        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}> 
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    PRIVATE 
+        ${CMAKE_CURRENT_SOURCE_DIR}/src
+)
 
 # Link againsg dependencies
-target_link_libraries(QtzSecurity PUBLIC Qt5::Core)
+target_link_libraries(${PROJECT_NAME} PUBLIC Qt5::Core)
 
 # Handle different names under different OSes
 if(WIN32)
-target_link_libraries(QtzSecurity PRIVATE qca)
+    target_link_libraries(${PROJECT_NAME} PUBLIC qca)
 else()
-target_link_libraries(QtzSecurity PRIVATE qca-qt5)
+    target_link_libraries(${PROJECT_NAME} PUBLIC qca-qt5)
 endif()
+
+
+# Install and export
+include(GNUInstallDirs)
+
+export(TARGETS ${PROJECT_NAME} FILE "${PROJECT_NAME}Targets.cmake")
+
+install(TARGETS ${PROJECT_NAME}
+    EXPORT "${PROJECT_NAME}Targets"
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+)
+
+install(DIRECTORY "include/" DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/qtz/security)
+
+include(CMakePackageConfigHelpers)
+
+write_basic_package_version_file(
+    "${PROJECT_NAME}ConfigVersion.cmake"
+    VERSION ${PROJECT_VERSION}
+    COMPATIBILITY SameMajorVersion
+)
+
+install(EXPORT "${PROJECT_NAME}Targets"
+    FILE "${PROJECT_NAME}Targets.cmake"
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/
+    NAMESPACE Qtz::
+)
+
+install(FILES "cmake/${PROJECT_NAME}Config.cmake" 
+    "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake"
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/
+)
+
+# pkg-config
+configure_file("${PROJECT_NAME}.pc.in" "${PROJECT_NAME}.pc" @ONLY)
+
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.pc"
+    DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/pkgconfig
+)
