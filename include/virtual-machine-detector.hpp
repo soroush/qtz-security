@@ -16,6 +16,7 @@ public:
     bool checkCommand(const QString &command,
                       const QString &likelihood) const;
     void registry_check() const;
+    void run_command(char *cmd, char *detphrase, int dp_length) const;
 private:
     mutable int vm_score;
 };

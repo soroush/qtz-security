@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.1.0)
+cmake_minimum_required(VERSION 3.19.0)
 
 project(QtzSecurity VERSION 0.4.0 
     DESCRIPTION "Qtz Rapid Application Development Framework, Security Module"
@@ -9,26 +9,16 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
-if(CMAKE_VERSION VERSION_LESS "3.7.0")
-    set(CMAKE_INCLUDE_CURRENT_DIR ON)
-endif()
-
 # Check for dependencies
 find_package(Qt5 COMPONENTS Core REQUIRED)
-find_package(Qca-qt5 CONFIG REQUIRED)
+find_package(Qca CONFIG REQUIRED)
 
 # Include directories
 include_directories("include")
 
-# OS-dependent sources
-set(OS_SOURCES )
-if(WIN32)
-    list(APPEND OS_SOURCES QtzSecurity.rc)
-endif()
-
 # Define the library
 add_library (QtzSecurity SHARED
-    src/virtual-machine-detector.cpp
+    # src/virtual-machine-detector.cpp
     src/username.cpp
     src/unique-machine-id.cpp
     src/token.cpp
@@ -43,7 +33,7 @@ add_library (QtzSecurity SHARED
     src/authentication-source.cpp
     # Headers
     include/simple-authenticator.hpp
-    include/virtual-machine-detector.hpp
+    # include/virtual-machine-detector.hpp
     include/username.hpp
     include/unique-machine-id.hpp
     include/token.hpp
@@ -58,19 +48,25 @@ add_library (QtzSecurity SHARED
     include/authentication-source.hpp
     ${OS_SOURCES})
 
-# Add 'd' suffix to debug builds
-set_property(TARGET QtzSecurity PROPERTY DEBUG_POSTFIX d)
-
-# Set version
-set_target_properties(QtzSecurity PROPERTIES VERSION 0.4.0)
-set_target_properties(QtzSecurity PROPERTIES SOVERSION 0)
-
+# Set properties
+set_target_properties(QtzSecurity PROPERTIES 
+    VERSION 0.4.0
+    SOVERSION 0
+    DEBUG_POSTFIX d
+    CXX_STANDARD 17
+    CXX_STANDARD_REQUIRED TRUE
+    DEFINE_SYMBOL QTZ_SECURITY_LIBRARY
+)
 # pkg-config
 configure_file(QtzSecurity.pc.in QtzSecurity.pc @ONLY)
 
-# Define symbol exporter
-target_compile_definitions(QtzSecurity PRIVATE -DQTZ_SECURITY_LIBRARY)
-target_compile_features(QtzSecurity PRIVATE cxx_std_11)
+# Copy headers for local builds
+if(QTZ_LOCAL_BUILD)
+add_custom_command(TARGET QtzSecurity POST_BUILD COMMAND 
+    ${CMAKE_COMMAND} -P 
+        "${CMAKE_CURRENT_LIST_DIR}/../cmake/copy_local_includes.cmake" 
+        "${CMAKE_CURRENT_SOURCE_DIR}/include/" "security" "${QTZ_LOCAL_INCLUDES_DIR}")
+endif()
 
 # Install and export
 include(GNUInstallDirs)
@@ -99,4 +95,4 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/QtzSecurity.pc
         DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/pkgconfig)
 
 # Link againsg dependencies
-target_link_libraries(QtzSecurity Qt5::Core qca-qt5)
+target_link_libraries(QtzSecurity Qt5::Core qca)
