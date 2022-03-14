@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.1.0)
+cmake_minimum_required(VERSION 3.19.0)
 
 project(QtzSecurity VERSION 0.4.0 
     DESCRIPTION "Qtz Rapid Application Development Framework, Security Module"
@@ -8,10 +8,6 @@ project(QtzSecurity VERSION 0.4.0
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
-
-if(CMAKE_VERSION VERSION_LESS "3.7.0")
-    set(CMAKE_INCLUDE_CURRENT_DIR ON)
-endif()
 
 # Check for dependencies
 find_package(Qt5 COMPONENTS Core REQUIRED)
@@ -29,7 +25,7 @@ endif()
 
 # Define the library
 add_library (${PROJECT_NAME} SHARED
-    src/virtual-machine-detector.cpp
+    # src/virtual-machine-detector.cpp
     src/username.cpp
     src/unique-machine-id.cpp
     src/token.cpp
@@ -44,7 +40,7 @@ add_library (${PROJECT_NAME} SHARED
     src/authentication-source.cpp
     # Headers
     include/simple-authenticator.hpp
-    include/virtual-machine-detector.hpp
+    # include/virtual-machine-detector.hpp
     include/username.hpp
     include/unique-machine-id.hpp
     include/token.hpp
@@ -60,15 +56,6 @@ add_library (${PROJECT_NAME} SHARED
     ${OS_SOURCES}
 )
 
-# Set properties
-set_target_properties(${PROJECT_NAME} PROPERTIES 
-    PROPERTIES VERSION 0.4.0
-    PROPERTIES SOVERSION 0
-    CXX_STANDARD 11
-    DEBUG_POSTFIX "d"
-    DEFINE_SYMBOL "QTZ_SECURITY_LIBRARY"
-)
-
 target_include_directories(${PROJECT_NAME}
     PUBLIC 
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}> 
@@ -77,7 +64,27 @@ target_include_directories(${PROJECT_NAME}
         ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 
-# Link againsg dependencies
+# Set properties
+set_target_properties(QtzSecurity PROPERTIES 
+    VERSION 0.4.0
+    SOVERSION 0
+    DEBUG_POSTFIX d
+    CXX_STANDARD 17
+    CXX_STANDARD_REQUIRED TRUE
+    DEFINE_SYMBOL QTZ_SECURITY_LIBRARY
+    PUBLIC_HEADER "include/qtz-security.hpp"
+)
+
+# Copy headers for local builds
+if(QTZ_LOCAL_BUILD)
+add_custom_command(TARGET QtzSecurity POST_BUILD COMMAND 
+    ${CMAKE_COMMAND} -P 
+        "${CMAKE_CURRENT_LIST_DIR}/cmake/copy_local_includes.cmake" 
+        "${CMAKE_CURRENT_SOURCE_DIR}/include/" "security" "${QTZ_LOCAL_INCLUDES_DIR}"
+)
+endif()
+
+# Link against dependencies
 target_link_libraries(${PROJECT_NAME} PUBLIC Qt5::Core)
 
 # Handle different names under different OSes
@@ -91,6 +98,9 @@ endif()
 # Install and export
 include(GNUInstallDirs)
 
+# pkg-config
+configure_file(QtzSecurity.pc.in QtzSecurity.pc @ONLY)
+
 export(TARGETS ${PROJECT_NAME} FILE "${PROJECT_NAME}Targets.cmake")
 
 install(TARGETS ${PROJECT_NAME}
@@ -98,9 +108,11 @@ install(TARGETS ${PROJECT_NAME}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    PUBLIC_HEADER DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/qtz/security"
+    INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 )
 
-install(DIRECTORY "include/" DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/qtz/security)
+install(DIRECTORY "include/" DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/qtz/security")
 
 include(CMakePackageConfigHelpers)
 
@@ -113,7 +125,6 @@ write_basic_package_version_file(
 install(EXPORT "${PROJECT_NAME}Targets"
     FILE "${PROJECT_NAME}Targets.cmake"
     DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/
-    NAMESPACE Qtz::
 )
 
 install(FILES "cmake/${PROJECT_NAME}Config.cmake" 
