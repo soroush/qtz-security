@@ -15,6 +15,15 @@ QByteArray Crypto::decryptRawData(const QByteArray& input,
     return c.process(sinput).toByteArray();
 }
 
+
+QString Crypto::decrypt(const QString& base64Cipher,
+                        const QByteArray& rawKey,
+                        const QByteArray& rawIV) {
+    QByteArray rawCipher = QByteArray::fromBase64(base64Cipher.toLatin1());
+    QByteArray rawPlain = decryptRawData(rawCipher, rawKey, rawIV);
+    return QString::fromUtf8(rawPlain);
+}
+
 QString Crypto::decrypt(const QString& base64Cipher,
                         const QString& base64Key,
                         const QString& base64IV) {
@@ -34,6 +43,15 @@ QByteArray Crypto::encryptRawData(const QByteArray& input,
                   QCA::Encode, key, iv);
     QCA::SecureArray secureInput(input);
     return c.process(secureInput).toByteArray();
+}
+
+QString Crypto::encrypt(const QString& input,
+                        const QByteArray& rawKey,
+                        const QByteArray& rawIV) {
+    QByteArray base64Cipher = encryptRawData(input.toUtf8(),
+                              rawKey,
+                              rawIV).toBase64();
+    return QString::fromLatin1(base64Cipher);
 }
 
 QString Crypto::encrypt(const QString& input,

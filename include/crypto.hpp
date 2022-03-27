@@ -24,12 +24,18 @@ public:
                                      const QByteArray& rawKey, const QByteArray& rawIV);
 
     static QString decrypt(const QString& base64Cipher,
+                           const QByteArray& rawKey, const QByteArray& rawIV);
+
+    static QString decrypt(const QString& base64Cipher,
                            const QString& base64Key,
                            const QString& base64IV = QString());
 
     static QByteArray encryptRawData(const QByteArray& input,
                                      const QByteArray& rawKey,
                                      const QByteArray& iv = QByteArray());
+
+    static QString encrypt(const QString& input,
+                           const QByteArray& rawKey, const QByteArray& rawIV);
 
     static QString encrypt(const QString& input,
                            const QString& base64Key,
