@@ -1,6 +1,4 @@
-cmake_minimum_required(VERSION 3.19.0)
-
-
+cmake_minimum_required(VERSION 3.18.0)
 
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
