@@ -1,8 +1,8 @@
-cmake_minimum_required(VERSION 3.18.0)
+cmake_minimum_required(VERSION 3.10.0)
 
 project(QtzSecurity VERSION 0.4.0 
     DESCRIPTION "Qtz Rapid Application Development Framework, Security Module"
-    HOMEPAGE_URL "https://github.com/soroush/qtz-security"
+    # HOMEPAGE_URL "https://github.com/soroush/qtz-security"
     LANGUAGES CXX)
 
 enable_testing()

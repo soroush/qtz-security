@@ -1,3 +1,7 @@
+cmake_minimum_required(VERSION 3.10)
+
+enable_testing()
+
 # List of tests
 set(QTZ_SECURITY_TESTS tst_encrypt tst_decrypt tst_sign tst_verify)
 add_executable(tst_encrypt "tst_encrypt.cpp")
@@ -23,9 +27,9 @@ foreach(TEST_TARGET ${QTZ_SECURITY_TESTS})
 endforeach()
 
 
-add_custom_command (TARGET tst_encrypt POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_directory $<TARGET_FILE_DIR:QtzSecurity> $<TARGET_FILE_DIR:tst_encrypt>
-)
+# add_custom_command (TARGET tst_encrypt POST_BUILD
+#     COMMAND ${CMAKE_COMMAND} -E copy_directory $<TARGET_FILE_DIR:QtzSecurity> $<TARGET_FILE_DIR:tst_encrypt>
+# )
 
 # find Powershell and openssl executables
 if(WIN32)

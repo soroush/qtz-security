@@ -16,7 +16,7 @@ openssl rsa -in "${root_dir}/data/rsa.private.pem" -out "${root_dir}/data/rsa.pu
 rsaPrivate="${root_dir}/data/rsa.private.pem"
 rsaPublic="${root_dir}/data/rsa.public.pem"
 
-for i in `seq 1 10`
+for i in `seq 1 100`
 do
     plain="${root_dir}/data/plain-${i}.bin"
     cypher="${root_dir}/data/cypher-${i}.bin"
