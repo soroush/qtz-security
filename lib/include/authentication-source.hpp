@@ -6,9 +6,10 @@
 /*
  * Authentication source is a source of information that provides information
  * on authentication credentials.
-*/
+ */
 
-class AuthenticationSource {
+class AuthenticationSource
+{
 public:
     AuthenticationSource() = default;
     virtual ~AuthenticationSource() = default;

@@ -8,9 +8,10 @@
  * attributes related to an entity".
  */
 
-class Identity {
-public:
-    Identity();
+class Identity
+{
+protected:
+    Identity() = default;
 };
 
 #endif // QTZ_IDENTITY_HPP

@@ -1,8 +1,8 @@
 #ifndef QTZ_TOKEN_HPP
 #define QTZ_TOKEN_HPP
 
-
-class Token {
+class Token
+{
 public:
     Token();
 };

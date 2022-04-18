@@ -1,17 +1,15 @@
 #ifndef QTZ_SECURITY_LICENSEMANAGER_HPP
 #define QTZ_SECURITY_LICENSEMANAGER_HPP
 
-#include <QByteArray>
 #include "qtz-security.hpp"
+#include <QByteArray>
 
-class QTZ_SECURITY_SHARED_EXPORT LicenseManager {
+class QTZ_SECURITY_SHARED_EXPORT LicenseManager
+{
 public:
     LicenseManager() = default;
-    LicenseManager(const QByteArray& publicKeyPEM,
-                   const QByteArray& saltMD5 = QByteArray(),
-                   const QByteArray& softwareCodeMD5 = QByteArray(),
-                   const QByteArray& customerCodeMD5 = QByteArray(),
-                   const QByteArray& activationCodeRaw = QByteArray());
+    LicenseManager(const QByteArray& publicKeyPEM, const QByteArray& saltMD5 = QByteArray(), const QByteArray& softwareCodeMD5 = QByteArray(),
+                   const QByteArray& customerCodeMD5 = QByteArray(), const QByteArray& activationCodeRaw = QByteArray());
     LicenseManager(const LicenseManager&) = delete;
     ~LicenseManager() = default;
 

@@ -5,9 +5,10 @@
 
 #include <QByteArray>
 
-class QTZ_SECURITY_SHARED_EXPORT UniqueMachineID {
+class QTZ_SECURITY_SHARED_EXPORT UniqueMachineID
+{
 public:
-    static QByteArray getMachineID(const QByteArray& salt=QByteArray());
+    static QByteArray getMachineID(const QByteArray& salt = QByteArray());
 };
 
 #endif // QTZ_UNIQUEMACHINEID_H

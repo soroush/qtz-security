@@ -1,10 +1,11 @@
 #ifndef QTZ_SECURITY_KEYRING_HPP
 #define QTZ_SECURITY_KEYRING_HPP
 
-#include <QByteArray>
 #include "qtz-security.hpp"
+#include <QByteArray>
 
-class QTZ_SECURITY_SHARED_EXPORT KeyRing {
+class QTZ_SECURITY_SHARED_EXPORT KeyRing
+{
 public:
     KeyRing() = default;
     virtual ~KeyRing() = default;
@@ -16,7 +17,8 @@ public:
     static KeyRing* defaultKeyRing();
 };
 
-class DefaultKeyRing : public KeyRing {
+class DefaultKeyRing : public KeyRing
+{
 public:
     DefaultKeyRing() = default;
     QByteArray provideRawKey() const override;

@@ -1,8 +1,3 @@
 include(CMakeFindDependencyMacro)
 find_package(Qt5 COMPONENTS Core REQUIRED)
-if(WIN32)
-find_package(qca CONFIG REQUIRED)
-else()
-find_package(Qca-qt5 CONFIG REQUIRED)
-endif()
 include("${CMAKE_CURRENT_LIST_DIR}/QtzSecurityTargets.cmake")
