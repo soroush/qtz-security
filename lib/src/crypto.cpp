@@ -20,6 +20,8 @@ QByteArray Crypto::decryptRawData(const QByteArray& input, const QByteArray& raw
     const unsigned char* iv = reinterpret_cast<const unsigned char*>(rawIV.constData());
     unsigned char* plaintext = (unsigned char*)OPENSSL_malloc(ciphertext_len);
     int plaintext_len = 0;
+    int len = 0;
+    int error_code = 0;
     QByteArray plainData;
 
     EVP_CIPHER_CTX* ctx = EVP_CIPHER_CTX_new();
@@ -27,11 +29,10 @@ QByteArray Crypto::decryptRawData(const QByteArray& input, const QByteArray& raw
         goto handle_error;
 
     // Perform decryption
-    int error_code = EVP_DecryptInit_ex(ctx, EVP_aes_128_cbc(), NULL, key, iv);
+    error_code = EVP_DecryptInit_ex(ctx, EVP_aes_128_cbc(), NULL, key, iv);
     if (error_code != 1)
         goto handle_error;
 
-    int len = 0;
     error_code = EVP_DecryptUpdate(ctx, plaintext, &len, ciphertext, ciphertext_len);
     if (error_code != 1)
         goto handle_error;
@@ -81,6 +82,8 @@ QByteArray Crypto::encryptRawData(const QByteArray& input, const QByteArray& raw
     const int initial_cipher_length = plaintext_len + (block - (plaintext_len % block));
     unsigned char* ciphertext = new unsigned char[initial_cipher_length];
     int ciphertext_len = 0;
+    int len = 0;
+    int error_code = 0;
     QByteArray cipherData;
 
     EVP_CIPHER_CTX* ctx = EVP_CIPHER_CTX_new();
@@ -88,12 +91,11 @@ QByteArray Crypto::encryptRawData(const QByteArray& input, const QByteArray& raw
         goto handle_error;
 
     // Perform encryption
-    int error_code = EVP_EncryptInit_ex(ctx, EVP_aes_128_cbc(), NULL, key, iv);
+    error_code = EVP_EncryptInit_ex(ctx, EVP_aes_128_cbc(), NULL, key, iv);
 
     if (error_code != 1)
         goto handle_error;
 
-    int len = 0;
     error_code = EVP_EncryptUpdate(ctx, ciphertext, &len, plaintext, plaintext_len);
     if (error_code != 1)
         goto handle_error;
@@ -137,6 +139,8 @@ QByteArray Crypto::signRaw(const QByteArray& input, const QString& PEM, const QS
     const unsigned char* msg = reinterpret_cast<const unsigned char*>(input.constData());
     unsigned char* signed_message = nullptr;
     QByteArray signature;
+    int errcode = 0;
+    std::size_t msg_len = 0;
 
     // Read the PEM key data
     const QByteArray PEM_data = PEM.toLatin1();
@@ -152,7 +156,6 @@ QByteArray Crypto::signRaw(const QByteArray& input, const QString& PEM, const QS
     RSA* rsa = EVP_PKEY_get1_RSA(pkey);
 
     // Prepare signature algorithm
-    int errcode = 0;
     EVP_MD_CTX* mdctx = EVP_MD_CTX_create();
     if (mdctx == nullptr)
         goto handle_error;
@@ -167,7 +170,6 @@ QByteArray Crypto::signRaw(const QByteArray& input, const QString& PEM, const QS
         goto handle_error;
 
     // Calculate the signature length
-    std::size_t msg_len = 0;
     errcode = EVP_DigestSignFinal(mdctx, NULL, &msg_len);
     if (errcode != 1)
         goto handle_error;
